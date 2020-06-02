@@ -1,0 +1,309 @@
+\documentclass[12pt]{article}
+\usepackage{etex}%pour profiter pleinement du moteur pdftex.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french,english]{babel}
+\usepackage[babel=true]{csquotes} % csquotes va utiliser la langue définie dans babel
+\usepackage{geometry}%%définir les marges
+\usepackage{graphicx}
+\usepackage{lmodern}% police vectorielle
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+%\usepackage{slashbox}
+\usepackage{lastpage}
+\usepackage{afterpage}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage{footnote}
+\usepackage{xspace}
+\usepackage[font=small,skip=10pt]{caption}
+\newcommand{\disp}{\textsc{Displayce}\xspace}
+\newcommand{\Vast}{\bBigg@{5}}
+\makesavenoteenv{table}
+\hypersetup{hidelinks}
+\geometry{
+	paper=a4paper, % Paper size, change to letterpaper for US letter size
+	top=3cm, % Top margin
+	bottom=3cm, % Bottom margin
+	left=2.5cm, % Left margin
+	right=2.5cm, % Right margin
+	headheight=14pt, % Header height
+	footskip=1cm, % Space from the bottom margin to the baseline of the footer
+	headsep=0.5cm, % Space from the top margin to the baseline of the header
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+%\parindent=0cm
+\newtheorem{theorem}{Theorem}
+
+\fancypagestyle{test}{
+	\cfoot{\includegraphics[width=62mm,height=12mm]{univtours-logo-droit.pdf}}}
+
+\AddThinSpaceBeforeFootnotes
+\FrenchFootnotes
+\pagestyle{fancy}
+\lhead{\includegraphics[width=25mm,height=12mm]{mecen.jpg}}
+\rhead{\includegraphics[width=25mm,height=12mm]{displayce.png}}
+\cfoot{\includegraphics[width=62mm,height=12mm]{univtours-logo-droit.pdf}}
+\rfoot{\thepage/\pageref{LastPage}}
+
+
+\newcommand{\HRule}{\rule{\linewidth}{0.3mm}}
+
+%-------------LOGO Mécen
+\newcommand{\MEE}{\hspace{-.25cm}{\fontfamily{pnc} \selectfont{
+			\mbox{
+				{\color[RGB]{52,74,88}M}
+				\kern-.446em\lower.75ex\hbox{\color[RGB]{7,93,142}\'E}%
+				\kern-.1427em\lower.795ex\hbox{\color[RGB]{7,93,142}c}%
+				\kern-.511em\lower -.24ex\hbox{\color[cmyk]{0.85,0.43,0.37,0.08}$\mathbb{E}$}
+				\kern-.38em\lower -.24ex\hbox{\color[cmyk]{0.85,0.43,0.37,0.08}n}}}}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+	\selectlanguage{french}
+	\renewcommand*{\tableautorefname}{Table}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newgeometry{textheight=26cm,textwidth=18cm}
+	\pagenumbering{gobble}%pas de numéro de page
+	\thispagestyle{plain}
+\begin{center}
+	\textsc{\Large Master \'Economiste d'entreprise}\\[1cm]
+	\hspace{-2cm}{\scalefont{7}\selectfont \MEE} \\\vspace{1.5cm}
+	\includegraphics[scale=2]{displayce.png} \\\vspace{1.5cm}
+	%\textsc{\Large Displayce}\\\vspace{2cm}
+	\HRule \\\vspace{.5cm}
+	{\Huge\bfseries Internship in Data Science}\\
+	\vspace{.5cm}\HRule \\\vspace{3cm}
+	
+	% Author and supervisor
+	
+	\large{\begin{minipage}{0.4\textwidth}
+			\begin{flushleft}
+				\textsc{Thomas Maurice}\\\vspace{.5cm}
+			\end{flushleft}
+		\end{minipage}
+		\begin{minipage}{0.4\textwidth}
+			\begin{flushright}% \large
+				\emph{Displayce} \\
+				M. \textsc{Soueidan}\\\vspace{1cm}
+				\emph{Université de Tours} \\
+				M. \textsc{Favard}\\
+			\end{flushright}
+	\end{minipage}}
+	% Bottom of the page
+	
+	\vspace{2cm}\today \\
+	\vspace{2cm}
+	\includegraphics[scale=0.2]{univtours-logo-droit.pdf}\\
+\end{center}
+\restoregeometry
+\pagenumbering{arabic}%commencer numérotation
+\color{white}
+a\\
+\color{black}
+\normalsize
+\selectlanguage{english}
+\renewcommand{\contentsname}{Table of contents}
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\subsection{What is Displayce?}
+
+\disp is the first \textsc{dsp}\footnote{Demand Side Platform: a technological solution that allows you to automate the purchase of advertising inventory.} and the leading technological platform designed to optimise ad campaigns run on digital posters and billboards. It is what we called the \textsc{dooh} which stands for \emph{Digital Out Of Home}. An ad campaign's impact and quality can be optimized thanks to the programmatic purchase which falling within the scope of the open real time bidding, allows to spend an ad budget efficiently over time and space. Hence, \disp is an intermediary between supply and demand where the supply is a digital posters publisher and the demand is an advertiser. \\
+
+Founded in 2014 by Laure Malergue, \disp is the leading \textsc{dsp} in France with access in more than 38 000 digital posters within different points of interet such as shopping malls, car parks, tobacco shops and avenues. Being the main intermediary, the platform then is of interest for both supply and demand. It allows publishers to reach multiple potential advertisers (supply side) and media agencies to benefit from a centralization of a major part of the offer (demand side). In general, it eliminates all the tedious negotiation and booking steps formerly effective. The interest in positioning itself as a \textsc{dsp} specialising in digital psoters lies in the fact that the latter are becoming increasingly attractive. Indeed, their dynamic aspect, contrary to the old outdoor displays, is a force of attraction for consumers and the cost of setting up an advertisement display is practically nil. \\
+
+\subsection{How does DOOH works?}
+
+As we discuss previously, \textsc{dooh} allows to display an ad on a digital poster. We are now going to explain how does it work technically. \\
+Let's take the case of a single digital panel. This panel is configured in the following way: it performs a one-minute loop with 10 seconds of broadcast per ad, so there are 6 ads that run in a loop on this panel. Each ad is submitted by a textc{dsp} such as \disp. The peculiarity is that out of these 6 ads, 5 come from so-called "acquired" campaigns and one comes from a real-time auction. Acquired campaigns are generally reserved for the week and therefore this means that during a week on the same billboard every minute the same 10 second ad comes back. The last ad, the one that comes from a real-time auction, is therefore variable, meaning that every minute, the last 10 seconds for example, it will not be the same ad as the previous minute. \\
+
+Let's now detail how the real-time auction works. To be able to participate in an auction, you must already be connected to the panel in question in order to have previously submitted the right advertising format to be displayed. Let's suppose that there are 4 \textsc{dsp} connected to a panel with 4 different ads. Just before the 10 seconds of the real-time auction ad broadcast, the panel issues a bid request to the 4 \textsc{dsp}. A bid request contains the following information: the exact time, the location of the panel, the number of impressions\footnote{An impression is a person looking at a panel: if in $T$ there are 4 people in front of the panel then the bid request will provide a number of impressions equal to 4.} and the qualitative detail of the impressions, i.e. the type and age class of each impression. Based on the information received, each \textsc{dsp} bids and the winner is the highest bidder. Depending on the type of auction he will pay the price he announced himself or the price of the second best (we will detail the different types of auction in the next section). The winner of the auction will then see his advertisement broadcast for 10 seconds on the panel but contrary to acquired campaigns this broadcast is not guaranteed for the next minute when a new bid request will be made.  
+
+\subsection{What is a bid request?}
+
+We talked earlier about bid requests and real-time bidding. Let's explain what this consists of. The \textsc{rtb} (Real time bidding) is a server-to-server buying process that allows inventory (ad space) to be bought and sold on a per-impression basis (where an impression is a person who sees the specific ad). It happens instantaneous through an auction that determines who gets to buy a specific impression. It happens programmatically in the same way as financial markets do. If a bid is won, the advertisers ad is immediately shown on the digital poster in the case of digital out of home. 
+
+A bid request provides information such as the exact location of the digital poster concerned, the exact time (to the nearest millisecond), the number of people in front of the poster and sometimes even the details of these people, namely their age group and gender. In the end, this information makes it possible to buy an audience rather than a panel location, and this is what allows optimization. The real time bidding system therefore makes it possible to develop algorithms for intermediaries such as \disp in order to optimise the budget expenditure, reach the largest audience, smooth the budget in time and space for example etc.
+
+\newpage
+
+\section{Auction theory}
+\subsection{Types of standard auctions}
+
+Auctions are transactions with a specific set of rules detailing resource allocation according to participants' bids (amounts of money they are willing to pay). In game theory auctions are categorized as games with incomplete information because in the vast majority, one player will possess information that other players don't. \\
+Standard auctions require that the winner of the auction be the participant with the highest bid. There are traditionally four types of auction that are used for the allocation of a single item: 
+\begin{enumerate}
+\item \emph{Ascending-bid auction} where the price is successively raised until only one
+bidder remains and that bidder wins the item at the final price. 
+\item \emph{Descending-bid auction} works in exactly the opposite way. The auctioneer
+starts at a very high price, and then lowers the price continuously. The first bidder
+who agrees with the current price wins the item at that price. 
+\item \emph{First-price sealed-bid auction} where each bidder independently submits a
+single bid, without seeing others’ bids, and the object is sold to the bidder who
+makes the highest bid. The winner pays its bid.
+\item \emph{Second-price sealed-bid auction} works exactly the same way as the first-price sealed-bid auction except that the price the winner pays is the second-highest bidder’s bid. This type of auction is also called \emph{Vickrey's auction}.
+\end{enumerate} 
+This four types can be shortened to two types. Descending-bid auction and First-price sealed-bid auctions are based on the same principles. Each bidder must choose a price to call out, conditional on no other bidder having yet called out; and the bidder who chooses the highest price wins the item at the price called out. In both case, the winner pays the bid he/she called out.
+The Ascending-bid auction and the Second-price sealed-bid rest on the same principles as well but a little more reflection is needed. In an Ascending-bid auction, it is clearly a dominant strategy to stay in the bidding until the price reaches your maximum valuation of the good, that is, until you are just indifferent between winning and not winning. The next-to-last person will drop out when his/her maximum valuation of the good is reached, so the person with the highest bid will win at a price equal to the bid of the second-highest bidder. In a Second-price sealed-bid auction, a Nash equilibrium strategy is to bid the maximal valuation of the good you have, because if the worst comes to the worst you would pay your maximal valuation of the good minus $\varepsilon$ so in every case you will have a positive payoff so there is no incentive to deviate from this strategy. Here again, the person with the highest bid will win at a price equal to the bid of the second-highest bidder. Now that we can distinguish two types of standard auction from the bidder's point of view, we should ask which is the most profitable type? The answer is in the \emph{Revenue Equivalence Theorem} (Vickrey, 1961) which states  that for certain economic environments, the expected revenue and bidder profits for a broad class of auctions will be the same provided that bidders use equilibrium strategies.
+\newpage
+
+\subsection{Revenue Equivalence Theorem analysis}
+
+\begin{theorem}
+For any two Bayesian-Nash incentive compatible mechanisms, if the surplus function is the same in both mechanisms, the valuation  of each player is drawn from the same continuous distribution and each player bid their optimal strategy then the expected payments of all types are the same in both mechanisms, and hence the expected revenue (sum of payments) is the same in both mechanisms.
+\end{theorem}
+Let's clarify some important terms. The maximal valuation that a consumer has for a good is the maximal price he is willing to pay for this good. The consumer's surplus is the difference between the valuation that a consumer have of a good and the price he pays for this good. Namely, it is the gain of a consumer after a purchase. Finally the optimal strategy is the bid that a player should call in order to maximize his surplus. We call it as a Nash equilibrium when no deviation is worth it.\\
+
+This part will bring a proof of the revenue equivalence theorem. To do so we will consider two standard auction mechanisms: second-price and first-price.\\
+Let's assume an auction with two risk-neutral bidders and one seller. The seller sells a single item. Each bidder $i$ has a valuation $v_i$ of the good, $v_i$ is drawn independantly in a uniform distribution $[0,1]$. We study standard auction so the bidder with the highest bid wins. Bidder $i$ calls out a bid $b_i(v_i)$ that is increasing in $v_i$ so that the bidder with the highest valuation of the good wins. We recall that the revenue equivalence theorem states that if there are 2 bidders with values drawn from $U[0,1]$ then for any standard auction the winner bidder with valuation $v$ will pay in average $\frac{1}{3}$ and will have an expected surplus $\frac{1}{2}v^2$. More generally, if there are $N$ bidders with valuation from a continuous distribution, then any standard auction leads to the same expected highest bid and the same expected bidder surplus. 
+
+\subsubsection{Second-price auction}
+To evolve the proof of the revenue equivalence theorem let's study the case in the second-price auction. We will first clarify the payment rule for this auction, then we will show that the optimal strategy for each player is to bid their maximal valuation of the good noticed $v_i$ for player $i$. Next step will be to find the expected $v_i$ assuming that $v_i > v_j$ is $\frac{2}{3}$ in our framework. Finally we will deduce that the expected bid of player $i$ is $b_i^* = \frac{1}{2}v_i = \frac{1}{3}$ and the expected surplus is given by $S(v_i)^* = \frac{1}{2}v_i^2 = \frac{2}{9}$.\\
+
+\noindent The payment rule of this auction is the following: 
+\begin{itemize}
+	\item if $b_i < b_j$, bidder $i$ pays $0$
+	\item if $b_i > b_j$, bidder $i$ pays $b_j$
+\end{itemize}
+The Nash equilibrium for a Vickrey auction is that all players bid their maximal valuation for the good namely: $b_i = v_i$. It is a dominant strategy because if $v_i > v_j$ then player $i$ has a payoff equal to $v_i - v_j > 0$ because $i$ would win the auction and pays the second price namely $v_j$. Player $j$'s payoff is 0. There is no incentive to deviate for each player, indeed, if player $i$ deviates, he loses surplus. If player $j$ wants to change is payoff of 0, then he has to bid more than $v_i$ in which case the payoff would be $v_j - v_i < 0$ so neither player $i$ nor player $j$ have an incentive to deviate.\\
+
+\noindent The equilibrium strategies for both players are: \\
+$b_i^* = v_i$ \\
+$b_j^* = v_j$\\
+Now let's assume that $v_i > v_j$ so that player $i$ wins. The next step is to find to what $v_i$ and $v_j$ are equal. To do so we have to find the expected value of the highest draw in a uniform law $U[0,1]$.\\
+
+Consider N independent draws from a uniform distribution over $[0, 1]$. On average, what is the highest draw?\\
+
+Let $X_i$ be a single draw from the uniform distribution. Then it follows that it has a cumulative density function of  $$F(x) = \left\{\begin{array}{lr}
+x, & 0\le x < 1,\\
+1, & x = 1,\\
+0, & \text{ Otherwise}. \end{array}\right.$$
+For N draws, then, what we are looking for is $Y=\max(X_i)$. The cumulative density function of $Y$ is equal to $\mathbb{P}(Y\le y)$.\\
+Since $Y$ is the max, no independant draw $X_i$ can be greater than $y$ thus we can write:
+\begin{flalign*}
+\mathbb{P}(Y\le y) =& \ \mathbb{P}(X_1\le y, X_2\le y,\ldots,X_N\le y)&\\
+=& \ \mathbb{P}(X_1\le y)\mathbb{P}(X_2\le y)\ldots\mathbb{P}(X_N\le y)&\\
+=& \ F(y)F(y)\ldots F(y) &\\
+=& \ [F(y)]^N
+\end{flalign*}
+The above cumulative density function is continuous, so we can find the probability density function of $Y$ by taking its derivative: $NF(y)^{N-1}\times f(y)$ and since we are over $[0,1]$, $f(y)=1$.\\
+Then reminding that $\mathbb{E}(X) = \displaystyle \int_a^b xf(x)\ dx$, we can calculate:
+\begin{flalign*}
+\mathbb{E}(Y) =& \ \displaystyle \int_0^1 y(Ny^{N-1})\ dy &\\
+=& \ \displaystyle \int_0^1 Ny^{N}\ dy &\\
+=& \ \biggl[ \dfrac{N}{N+1}y^{N+1} \biggr]_0^1
+\end{flalign*}
+So we obtain $$\boxed{\mathbb{E}(Y) = \dfrac{N}{N+1}}$$
+
+\noindent Symmetrically we can obtain that on average the lowest draw is given by:\\
+$$\boxed{\mathbb{E}(Y) = 1 - \dfrac{N}{N+1}}$$ \\
+
+\vspace{.1cm}
+\noindent Let's go back to our model. As we have 2 players, $N=2$ so the expected highest valuation of the good is $v_i = \dfrac{2}{3}$ and the expected lowest valuation is $v_j = \dfrac{1}{3}$ which is more generally $v_j = \dfrac{1}{2}v_i$.\\
+We can see that the expected payment by the winner is as we have seen in the theorem:
+$$\boxed{b_i^* = v_j = \dfrac{1}{2}v_i = \dfrac{1}{3}}$$
+Now let's calculate the expected surplus of the winner. Notice that if a bidder has value $v_i$, he expects to win whenever the other bidder has a value less than $v_i$; which happens with probability equal to $v_i$. We can deduce the expected surplus:
+$S(v_i) = v_i(v_i - \dfrac{1}{2}v_i)$.
+$$\boxed{S(v_i)^* = \dfrac{1}{2}v_i^2 = \dfrac{2}{9}}$$
+\vspace{1cm}
+\subsubsection{First-price auction}
+Now we need to find the expected bid and revenu of this type of auction in order to compare with the second-price auction results and so prove the revenue equivalence theorem. We will first clarify the payment rule for this auction, then we will show that the optimal strategy for each player is to bid half of their maximal valuation of the good noticed $v_i$ for player $i$. Finally we will deduce that the expected bid of player $i$ is $b_i^* = \frac{1}{2}v_i = \frac{1}{3}$ and the expected surplus is given by $S(v_i)^* = \frac{1}{2}v_i^2 = \frac{2}{9}$ exactly the same as the second price auction.\\
+
+\noindent The payment rule of this auction is the following: 
+\begin{itemize}
+	\item if $b_i < b_j$, bidder $i$ pays $0$
+	\item if $b_i > b_j$, bidder $i$ pays $b_i$
+\end{itemize}
+A first price auction with two risk-neutral bidders whose valuations are independantly drawn from a uniform distribution $U[0,1]$ has Nash equilibrium strategies: $(\frac{1}{2}v_i,\ \frac{1}{2}v_j)$. Let's proove that this equilibrium exists.\\
+
+\noindent Assume that bidder $j$ bids $b_j = \dfrac{1}{2}v_j$, we need to find the best response $b_i$ of bidder $i$.\\
+Player $i$ wins when $b_i > \dfrac{1}{2}v_j$, namely $v_j < 2b_i$. If this inequality is true, then player $i$ has a surplus equals to $v_i - b_i$. \\
+Inversely, player $i$ loses when $v_j > 2b_i$ and so has a surplus equals to $0$.\\
+We can then deduce the expected surplus of bidder $i$ given the strategy of bidder $j$.
+\begin{flalign*}
+\mathbb{E}(S_i) =& \ \displaystyle \int_0^{2b_i} (v_i-b_i)\ dv_j + \displaystyle \int_{2b_i}^1 0\ dv_j &\\
+ =& \ \bigl[(v_i-b_i)v_j \bigr]_0^{2b_i} &\\
+ =& \ 2v_ib_i-2b_i^2
+\end{flalign*}
+To find the best $b_i$ we have to maximize the expected surplus by taking its derivative and by equalizing it to $0$.\\
+
+$\dfrac{\partial\mathbb{E}(S_i)}{\partial b_i} = 0 \Leftrightarrow 2v_i-4b_i = 0$, so we have: $b_i = \dfrac{1}{2}v_i $.\\
+The best strategy of player $i$ is to bid half of his valuation, and as the game is symmetric player $j$'s best response is $\dfrac{1}{2}v_j$. \\
+As shown in the second-auction case, assuming that valuations are drawn independantly from a uniform distribution and that $v_i > v_j$, the expected valuation of bidder $i$ is $v_i = \dfrac{2}{3}$. As $v_i > v_j$, bidder $i$ wins and pay its bid, so we have:
+$$\boxed{b_i^* = \dfrac{1}{2}v_i = \dfrac{1}{3}}$$
+The optimal bid of the winner is exactly the same under second-price and first-price auction. Here again, notice that if a bidder has value $v_i$, he expects to win whenever the other bidder has a value less than $v_i$; which happens with probability equal to $v_i$. The expected surplus will be the same as the second-price auction one:
+$S(v_i) = v_i(v_i - \dfrac{1}{2}v_i)$.
+$$\boxed{ S(v_i)^* = \dfrac{1}{2}v_i^2 = \dfrac{2}{9}}$$
+
+More generally, for any given standard auction, denoting $S(v)$ the expected utility of player with a valuation $v$ of the good and $b$ the bid he called out, his surplus is the following:\\
+$S(v) = v\mathbb{P}(v) - b$, so\\
+$S(v)' = \mathbb{P}(v) = v$ in our context. $S(v)'$ is the probability to win the auction. Now for any standard auction, we denote $S(0)=0$, namely a bidder with the lowest possible valuation of the good make $0$ expected surplus.\\
+Given a uniform distribution $U[0,1]$, the \emph{Fundamental Theorem of Calculus} gives us that:\\
+$S(v) = S(0) + \displaystyle \int_0^v S(v)'\ dv = \displaystyle \int_0^v v\ dv$ which gives us the expected surplus of a bidder with valuation $v$ for any standard action.
+$$\boxed{S(v) = \dfrac{1}{2}v^2} $$
+
+\newpage
+\subsection{Entry cost in Vickrey's auction}
+The objective of this part is to ease the assumption that there is no entry cost in order to find the optimal bidding strategy as part of the second-price auction. The main difference with the previous analysis is that the game is now in two steps: the first step is to decide whether to participate to the auction and the second step is to define the optimal bidding strategy. \\
+
+Let's focus on the simple case to understand the mechanism of the first step. We will see that the objective is to find a cut-off, where we decide to enter the auction. The idea is that this cut-off will be called $\tilde{v}$ and if our valuation is higher than $\tilde{v}$ then we enter, is our valuation is lower then we do not participate. \\
+
+To find $\tilde{v}$ let's take a simple model in the case of a Vickrey's auction (second-price auction). There are two bidders whose valuations are drawn from a continuous distribution $U[0,1]$ and there is a cost equal to $F$ if we enter the auction. \\
+
+Firstly, the objective is to find the threshold $\tilde{v}$. As $\tilde{v}$ is the minimal valuation that allows a participation, a bidder with a valuation equals to $\tilde{v}$ wins only if he is the only one to participate. He is the only one to participate only if other players have a valuation inferior to $\tilde{v}$ which happens with the probability: $\mathbb{P}(v_1<\tilde{v})\times...\times\mathbb{P}(v_{N-1}<\tilde{v})$ which is equal to $\tilde{v}^{N-1}$. We assume that the reserve price is 0. Then the bidder with valuation $\tilde{v}$ would have a payoff equals to: $\tilde{v}\times\tilde{v}^{N-1} = \tilde{v}^N$. The last step in order to find the cut-off $\tilde{v}$ is to consider the case when the bidder which has a valuation $\tilde{v}$ is indifferent between participating or not to the auction. This player is indifferent when his payoff is equal to the cost of entry, namely: $\tilde{v}^N = F$ which gives us: $\tilde{v} = F^{\frac{1}{N}}$.\\
+
+Now that we have determine the first stage of the game, we can deduce the optimal bidding strategy in the second stage. If a player has a valuation higher than $\tilde{v}$ then the optimal strategy doesn't change with the previous case. The Nash equilibrium strategy is to bid his own valuation of the good. The solution with entry cost in a Vickrey's auction is the following:
+$$b_i = \left\{\begin{array}{lr}
+v_i, & v_i>\tilde{v}=F^{\frac{1}{N}},\\
+\text{No entry}, & v_i<\tilde{v}=F^{\frac{1}{N}} \end{array}\right. $$\\
+
+The very interesting thing about the cost of entry is the idea of sunk cost fallacy. The basic previous model predicts that once you have paid the entry cost you should bid the same way as you would if there were no entry cost. We can imagine that intuitively players are incitated to deduce the entry cost to the bid they wanted to call before the auction. However, the previous model show that when a bidder has paid to enter the auction, any entry fee that he might have paid should have no bearing on his bidding strategy.
+
+\newpage
+
+\section{Pacing}
+
+Now that we introduce the how the digital out of home market works and explain some basics about auction theory, we will focus on the main subject of this report: a pacing algorithm. The objective of such an algorithm is to be able to smooth the advertising expenditure over a given time interval. The pacing concerns other dimensions than time, we can also consider smoothing the advertising expenditure over space but in our case we will first focus on the temporal dimension. \\
+
+To create such an algorithm, I have worked from scratch in Python. I have taken the following steps:
+\begin{itemize}
+\item Create loops to generate bid request and given the (perfect) estimation of the number of bid requests, we calculate a per second budget and we try to keep the real expenditure per second close to the target. The idea is to have the same behaviour as a cruise control algorithm, but instead of controlling the speed we control the budget delivery.
+\item The drawback of this method is that there is often a peak of expenditure at the end of the period and the simulation if far from the reality because there are not random events. 
+\item The next objective then, was to improve the simulation framework to be clother from the reality.
+\item I decide to use a discrete event simulator on Python. This kind of simulator allows to create a real dynamic of bid request arrivals.
+\item I then improve the framework by adding some random variables. So the time between two bid requests follows a Poisson Law and the $\lambda$ parameter follows itself a probability law such as each hour this parameter is not the same. 
+\item Now that the simulation framework is far better, we can begin to study a new pacing algorithm. The first idea is to have a dynamic estimation of the number of bid request each hour in order to allocate an hour budget. It allows us to take into account hours with high number of impressions and so to allocate more budget in those hours of the day. 
+\item To implement such an algorithm we can use a Kalman filter to have a dynamic estimation of the number of bid requests in real time. 	
+\item The first step before implement this algorithm is to have historical data to initialize the algorithm. I have created a function in Python that generates historical data thanks to the discrete event simulator. The variables we have are the following: the id of the bid request, the number of impressions, the price and the timestamp.
+\item For now, the simulation framework is the following: fix price per impression, each hour there is a different number of digital posters available, so each hour the number of seconds between 2 bid requests doesn't follow the same law. There is a 1\% probability of technical incident so there is no bid requests for a long period. 
+\end{itemize}
+
+
+\newpage
+\section*{Sources}
+\begin{description}
+\item[https://www.cs.ubc.ca/\textasciitilde cs532l/gt2/slides/11-4.pdf:] To find the Nash equilibrium in first price auction.
+\item[https://microeconomics.ca/okan\_yilankaya/spa.pdf: ] Cost entry
+\item[Auctions Theory and Practice by Paul Klemperer:] To state the Revenue equivalence theorem.
+\end{description}
+\end{document}
+
+
