@@ -1,2 +1,3 @@
 *.json
 venv/
+Pacing/.ipynb_checkpoints/*
