@@ -70,7 +70,27 @@
 				\kern-.38em\lower -.24ex\hbox{\color[cmyk]{0.85,0.43,0.37,0.08}n}}}}
 }
 
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{10} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{10}  % for normal
 
+% Custom colors
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+% Python style for highlighting
+\lstdefinestyle{python}{
+	language=Python,
+	basicstyle=\ttm,
+	otherkeywords={self},             % Add keywords here
+	keywordstyle=\ttb\color{deepblue},
+	emphstyle=\ttb\color{deepred},    % Custom highlighting style
+	stringstyle=\color{deepgreen},
+	frame=tb,                         % Any extra options here
+	showstringspaces=false            % 
+}
+\lstset{language=Python}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -294,7 +314,7 @@ To create such an algorithm, I have worked from scratch in Python. I have taken 
 \item To implement such an algorithm we can use a Kalman filter to have a dynamic estimation of the number of bid requests in real time. 	
 \item The first step before implement this algorithm is to have historical data to initialize the algorithm. I have created a function in Python that generates historical data thanks to the discrete event simulator. The variables we have are the following: the id of the bid request, the number of impressions, the price and the timestamp.
 \item For now, the simulation framework is the following: fix price per impression, each hour there is a different number of digital posters available, so each hour the number of seconds between 2 bid requests doesn't follow the same law. There is a 1\% probability of technical incident so there is no bid requests for a long period. 
-\item After thinking about it, I posed the problem as a mathematically constrained optimization. The key point here is that currently we don't have a measure of print quality and therefore we can't maximize on a variable that would measure print quality such as click through rate or conversion rate. Finally we can simply reduce such an optimization program to the following form:
+\item After thinking about it, I posed the problem as a mathematically constrained optimization. The key point here is that currently we don't have a measure of quality of impressions and therefore we can't maximize on a variable that would measure the impressions' quality such as click through rate or conversion rate. Finally we can simply reduce such an optimization program to the following form:
 \begin{align*}
 \max_{b_t} &\quad I \\
 s.c.  \qquad & 
@@ -308,8 +328,165 @@ s.c.  \qquad &
 Where $I$ is the number of impressions, $s(t)$ is the time expenditure $t$, $B$ is the total budget. The first constraint is the budget constraint, and the second constraint guarantees the objective of smoothing the expenditure in order to avoid lows or peaks of expenditure during the day. The optimization parameter is therefore $b_t$, the budget that is allocated in $t$. However, the number of impressions is exogenous, indeed the presence in front of a panel of individuals in $t$ does not depend on us. This is why at this stage the only way to guarantee a smooth expenditure over the day which thus respects the constraints presented above is to have a classic pacing algorithm which offers a budget per $t$ slice of the day. The algorithm could therefore estimate the times at which we receive bids requests and according to these times divide the day into $t$ time slots (in seconds or even more precisely) and therefore assign a budget per time slot. 
 $$b_{t+1} = \Bigr(B - \displaystyle \sum_{s=1}^{t} S(s)\Bigl) \dfrac{1}{T-t}$$
 where $b_{t+1}$ is the budget to be allocated to the second $t+1$, $B$ is the total budget for the day, $S(s)$ is the actual expenditure to the second $t$ and finally $T-t$ is the remaining time in seconds until the end of the day.  
+\item A new question that it would be legitimate to ask from now on, is the question of the quality of impressions. Indeed, despite the absence of variables such as the click through rate for example, it is questionable whether we could indirectly find ways to develop quality impressions. For example, one could imagine knowing for a city the time of passage of a certain type of population as well as the location (worker, executives, young people, elderly people, etc.). This would potentially allow a finer targeting than at present and thus have a real optimisation parameter in this program.
 \end{itemize}
 
+\newpage
+
+\begin{lstlisting}[style=Python]
+import numpy as np
+import random 
+import simpy
+import time
+import csv
+from collections import namedtuple
+from datetime import datetime
+import pandas as pd
+
+def panneaux_dispo(nb_heures, total_panneaux):
+	prop = np.random.normal(loc=0.8, scale=0.2, size=nb_heures)
+	pann_dispo = list(map(lambda x: int(total_panneaux*x if x<=1 \
+	else total_panneaux), prop))
+return pann_dispo
+
+def lambda_br(pann_dispo):
+	lam = list(map(lambda x: int((1000-x)/50) if x<950 else 1, pann_dispo))
+return lam
+
+def imps():
+	lam = int(np.random.normal(loc=4, scale=2, size=1))
+	if lam < 1:
+	lam = 1
+	nb_imp = np.random.poisson(lam)
+return nb_imp
+
+def delai(lam):
+secondes = np.random.poisson(lam)
+	if not random.random() < 0.99:
+	secondes = np.random.poisson(lam + 1000)
+return secondes
+
+def total_sec(nb_jours):
+	tot = nb_jours * 86400
+return tot
+
+def sauvegarde(liste, nom_de_fichier):
+	with open(nom_de_fichier, "w", encoding="utf8") as fichier:
+		premier, *_ = liste
+		ecrivain = csv.DictWriter(fichier, premier._fields)
+		ecrivain.writeheader()
+		for br in liste:
+			ecrivain.writerow(br._asdict())
+		
+			
+def open_rtb_pacing(env, P, B, timestampnow, nb_jours, nb_hours_per_day, bidrequests, \
+data):
+	setup = True
+	identifiant = 0
+	cible = B/(nb_hours_per_day*3600)
+	current_hour = datetime.strptime(datetime.fromtimestamp(env.now)\
+	.strftime("%m-%d-%Y %H:%M:%S"), '%m-%d-%Y %H:%M:%S').hour
+	while True:
+		if current_hour >= 6 and current_hour < 20:
+			if setup:
+				setup = False
+				dispo = panneaux_dispo(nb_hours_per_day, 1000)
+				lam_secondes = lambda_br(dispo)
+				current_hour = datetime.strptime( \
+				datetime.fromtimestamp(env.now).strftime( \
+				"%m-%d-%Y %H:%M:%S"), '%m-%d-%Y %H:%M:%S').hour
+				i = 0
+				S = list()
+				end_day = env.now + (nb_hours_per_day*3600)
+			
+			identifiant += 1
+			rt = (timestampnow+total_sec(nb_jours))-env.now
+			
+			bt = (B - sum(S))/(end_day - env.now) 
+			if bt < 0:
+				bt=0
+			
+			time = datetime.fromtimestamp(env.now).strftime( \
+			"%m-%d-%Y %H:%M:%S")
+			
+			nb_imp = imps()
+			Prix = P * nb_imp
+			
+			if bt >= cible:
+				S.append(Prix)
+				achat = 1
+				else:
+				achat = 0
+			
+			resultats = bidrequests(
+				identifiant = identifiant,
+				timestamp = env.now,
+				timestamp_string = time,
+				nombre_impressions = nb_imp,
+				prix_impression = P,
+				prix_total = Prix,
+				achat = achat,
+				budget_depense = sum(S),
+				bt = bt
+			)
+			data.append(resultats)
+			
+			if datetime.strptime(datetime.fromtimestamp(env.now) \
+			.strftime("%m-%d-%Y %H:%M:%S"), '%m-%d-%Y %H:%M:%S') \
+			.hour != current_hour:
+				i += 1 
+				current_hour = datetime.strptime(datetime \
+				.fromtimestamp(env.now).strftime("%m-%d-%Y %H:%M:%S"), \
+				'%m-%d-%Y %H:%M:%S').hour
+			
+			try:
+				time_before_next = delai(lam_secondes[i])
+			except IndexError:
+				time_before_next = delai(lam_secondes[i-1])
+			
+			if rt < time_before_next:
+				print(f"End at {time} !")
+			
+			yield env.timeout(time_before_next)
+		
+		else:
+			setup = True
+			current_hour = datetime.strptime(datetime.fromtimestamp( \
+			env.now).strftime("%m-%d-%Y %H:%M:%S"), \
+			'%m-%d-%Y %H:%M:%S').hour
+			time = datetime.fromtimestamp(env.now) \
+			.strftime("%m-%d-%Y %H:%M:%S")
+			rt = (timestampnow+total_sec(nb_jours))-env.now
+			if rt <= 1:
+				print(f"End at {time} !")
+			yield env.timeout(1) 
+			
+nb_days = 1
+prix_per_imp = 1
+Budget_par_jour = 3000
+
+timestampnow = int(time.time()-3600*15)
+bidrequests =  namedtuple(
+	"bidrequests", 
+	(
+		"identifiant", 
+		"timestamp", 
+		"timestamp_string",
+		"nombre_impressions",
+		"prix_impression",
+		"prix_total",
+		"achat",
+		"budget_depense",
+		"bt"
+	)
+)
+data = list()
+env = simpy.Environment(initial_time=timestampnow)
+proc = env.process(open_rtb_pacing(env, prix_per_imp, Budget_par_jour, timestampnow, \
+nb_days, 14, bidrequests, data))
+env.run(until=timestampnow + total_sec(nb_days))
+sauvegarde(data, 'data.csv')
+\end{lstlisting}
 
 \newpage
 \section*{Sources}
