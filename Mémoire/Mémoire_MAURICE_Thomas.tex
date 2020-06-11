@@ -294,6 +294,20 @@ To create such an algorithm, I have worked from scratch in Python. I have taken 
 \item To implement such an algorithm we can use a Kalman filter to have a dynamic estimation of the number of bid requests in real time. 	
 \item The first step before implement this algorithm is to have historical data to initialize the algorithm. I have created a function in Python that generates historical data thanks to the discrete event simulator. The variables we have are the following: the id of the bid request, the number of impressions, the price and the timestamp.
 \item For now, the simulation framework is the following: fix price per impression, each hour there is a different number of digital posters available, so each hour the number of seconds between 2 bid requests doesn't follow the same law. There is a 1\% probability of technical incident so there is no bid requests for a long period. 
+\item After thinking about it, I posed the problem as a mathematically constrained optimization. The key point here is that currently we don't have a measure of print quality and therefore we can't maximize on a variable that would measure print quality such as click through rate or conversion rate. Finally we can simply reduce such an optimization program to the following form:
+\begin{align*}
+\max_{b_t} &\quad I \\
+s.c.  \qquad & 
+\left\{
+	\begin{array}{ll} 
+		\displaystyle \sum_{t=1}^{T} s(t) = B\\
+		|s(t) - b_t | \leq \varepsilon_t\\
+	\end{array}
+\right.
+\end{align*}
+Where $I$ is the number of impressions, $s(t)$ is the time expenditure $t$, $B$ is the total budget. The first constraint is the budget constraint, and the second constraint guarantees the objective of smoothing the expenditure in order to avoid lows or peaks of expenditure during the day. The optimization parameter is therefore $b_t$, the budget that is allocated in $t$. However, the number of impressions is exogenous, indeed the presence in front of a panel of individuals in $t$ does not depend on us. This is why at this stage the only way to guarantee a smooth expenditure over the day which thus respects the constraints presented above is to have a classic pacing algorithm which offers a budget per $t$ slice of the day. The algorithm could therefore estimate the times at which we receive bids requests and according to these times divide the day into $t$ time slots (in seconds or even more precisely) and therefore assign a budget per time slot. 
+$$b_{t+1} = \Bigr(B - \displaystyle \sum_{s=1}^{t} S(s)\Bigl) \dfrac{1}{T-t}$$
+where $b_{t+1}$ is the budget to be allocated to the second $t+1$, $B$ is the total budget for the day, $S(s)$ is the actual expenditure to the second $t$ and finally $T-t$ is the remaining time in seconds until the end of the day.  
 \end{itemize}
 
 
