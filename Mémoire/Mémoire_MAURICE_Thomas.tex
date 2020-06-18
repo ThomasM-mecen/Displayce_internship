@@ -329,6 +329,26 @@ Where $I$ is the number of impressions, $s(t)$ is the time expenditure $t$, $B$ 
 $$b_{t+1} = \Bigr(B - \displaystyle \sum_{s=1}^{t} S(s)\Bigl) \dfrac{1}{T-t}$$
 where $b_{t+1}$ is the budget to be allocated to the second $t+1$, $B$ is the total budget for the day, $S(s)$ is the actual expenditure to the second $t$ and finally $T-t$ is the remaining time in seconds until the end of the day.  
 \item A new question that it would be legitimate to ask from now on, is the question of the quality of impressions. Indeed, despite the absence of variables such as the click through rate for example, it is questionable whether we could indirectly find ways to develop quality impressions. For example, one could imagine knowing for a city the time of passage of a certain type of population as well as the location (worker, executives, young people, elderly people, etc.). This would potentially allow a finer targeting than at present and thus have a real optimisation parameter in this program.
+\item But before looking at the quality of impressions, there is a pacing problem. Currently the operation explained above is based on two essential points: the first one is related to the estimation of the exact time of the last bid request, so that the $T-t$ calculation is precise and fair. Moreover it is absolutely necessary that the arrival of bid requests is more or less constant over time because if at the end of the period, the frequency of bid requests is too low, or at least not high enough to guarantee the exhaustion of the budget $b_t$ then there will be budget left at the end of the day and remember that the double objective is, firstly, to distribute the budget evenly over the day and secondly to ensure the total expenditure of the budget at the end of the day, the second constraint would not be taken into account. It is on this second objective that the use of the $b_{t+1}$ calculation has its limits, and so it is here that the rest of the work will be done.
+\item To complete the algorithm, I thought of doing a study of the proportions of bid requests purchased, because we can assume that if the budget is not totally exhausted at the end of the day it is partly due to the fact that there is a slowdown in the arrival of bids requests and therefore there are not enough to use up the entire budget. When we get to a purchase proportion that tends towards $100\%$, then we could imagine accelerating the purchase of bid requests to ensure that the total budget is exhausted at the end of the day. The idea would therefore be to study the proportion of bid requests purchased per hour and thus have an evolution over the day and repeat this process on historical data to see if a pattern emerges. The \autoref{prop1} is then obtained:
+
+\begin{figure}[h!]
+	\centering
+	\scalebox{0.7}{	\includegraphics[scale=1]{Graphs/prop.pdf}}
+	\caption{Proportion of bid requests bought each hour}
+	\label{prop1}
+\end{figure}
+
+We can therefore see that there is no pattern that emerges on the simulated data and therefore the improvement of the algorithm will not come from the study of proportions. Nevertheless, this idea must be kept in mind because nothing excludes that it works on real data rather than simulated data. 
+\item If we take a closer look at the simulated data, we can finally see that the cause of the problem is not directly related to the slowdown in the arrival of bid requests, but to the fact that the last bid requests end before the end time set by the simulation. A partial solution but which works perfectly on simulated data is to make the $T-t$ period shorter than the reality in order to "naturally" accelerate the purchase over the whole day and thus exhaust the budget at the end of the day. By taking 20 minutes of margin in the calculation, one arrives at a totally satisfactory result since one respects both the constraint of uniform distribution of the budget over the day and the constraint of the total exhaustion of the budget at the end of the day. The following figure (\autoref{pacing1}) shows the average expenditure per hour for each day of the simulation. It is clear that the pacing is effective because there is very few variations in the average expenditure between hours. 
+
+\begin{figure}[h!]
+	\centering
+	\scalebox{0.7}{	\includegraphics[scale=1]{Graphs/pacing1.pdf}}
+	\caption{Evolution of the average expenditure per hour}
+	\label{pacing1}
+\end{figure}
+
 \end{itemize}
 
 \newpage
