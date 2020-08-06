@@ -1,6 +1,7 @@
 *.json
 *.jsonl
 *.csv
+*.pkl
 venv/
 Pacing/.ipynb_checkpoints/*
 Mémoire/Mémoire_MAURICE_Thomas.aux
