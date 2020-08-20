@@ -3,10 +3,12 @@
 *.csv
 *.pkl
 venv/
-Pacing/.ipynb_checkpoints/*
+Pacing_notebooks/.ipynb_checkpoints/*
 Mémoire/Mémoire_MAURICE_Thomas.aux
 Mémoire/Mémoire_MAURICE_Thomas.log
 Mémoire/Mémoire_MAURICE_Thomas.out
 Mémoire/Mémoire_MAURICE_Thomas.synctex.gz
 Mémoire/Mémoire_MAURICE_Thomas.toc
-Pacing/log_pacing.log
+Pacing_notebooks/log_pacing.log
+Pacing_project/venv/*
+Pacing_project/.idea/*
