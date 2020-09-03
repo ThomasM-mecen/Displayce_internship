@@ -31,7 +31,8 @@ class Pacing:
         self.engaged_budget = 0
         self.spent_budget = 0
 
-    def gen_prop_lr(self, br_object):
+    @staticmethod
+    def gen_prop_lr(br_object):
         """Linear regression with hours and weekdays"""
         aggr = br_object.imps.groupby([br_object.index.date, br_object.index.weekday, br_object.index.hour]).sum()
         aggr.index.names = ['date', 'weekday', 'hour']
@@ -52,7 +53,8 @@ class Pacing:
             pattern.iloc[:, i] = pattern.iloc[:, i] * 100 / pattern.iloc[:, i].sum()
         return pattern
 
-    def gen_prop_lr_hour(self, br_object):
+    @staticmethod
+    def gen_prop_lr_hour(br_object):
         """Linear regression with only hours"""
         aggr = br_object.imps.groupby([br_object.index.date, br_object.index.hour]).sum().reset_index()
         aggr.columns = ['date', 'hour', 'imps']
