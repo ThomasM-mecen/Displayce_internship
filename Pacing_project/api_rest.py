@@ -80,9 +80,6 @@ class InitLineItem(object):
         data = json.loads(req.bounded_stream.read())
         if cpid not in self.bdd.campaigns.keys():
             raise falcon.HTTPNotFound(description=f"Campaign {cpid} doesn't exist")
-        tz_list = ['America/Boise', 'America/Chicago', 'America/Denver', 'America/Detroit',
-                   'America/Indiana/Indianapolis', 'America/Kentucky/Louisville', 'America/Los_Angeles',
-                   'America/New_York', 'America/Phoenix', 'Europe/London', 'Europe/Paris']
         try:
             self.check_params(data)
         except Exception as e:
@@ -91,8 +88,7 @@ class InitLineItem(object):
         try:
             pacing = GlobalPacing(total_budget=int(data['budget']),
                                   start_date=datetime.strptime(data['start'], '%Y-%m-%d'),
-                                  end_date=datetime.strptime(data['end'], '%Y-%m-%d'),
-                                  tz_list=tz_list)
+                                  end_date=datetime.strptime(data['end'], '%Y-%m-%d'))
             self.bdd.instances[data['liid']] = pacing
             self.bdd.campaigns[cpid].append(data['liid'])
             output = json.dumps({
@@ -164,6 +160,7 @@ class LineItem(object):
 class ReceiveBR(object):
     def __init__(self, bdd):
         self.bdd = bdd
+
     def check_and_parse_parameters(self, req):
         required_argument = {"tz", "cpm", "imps", "brid"}
         missing_argument = required_argument.difference(req.keys())
@@ -201,6 +198,7 @@ class ReceiveBR(object):
 class ReceiveNotification(object):
     def __init__(self, bdd):
         self.bdd = bdd
+
     def check_params(self, req):
         required_argument = {"status", "brid"}
         missing_argument = required_argument.difference(req.keys())

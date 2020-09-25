@@ -14,14 +14,13 @@ def send_pending_notifications(instance_obj, pending_notif, current_ts=None):
     """
     while len(pending_notif) > 0 and (pending_notif[0]['timestamp'] <= current_ts if current_ts else True):
         ev = pending_notif.pop(0)
-        instance_obj.dispatch_notifications(ev['id'], ev['status'], ev['br_price'])
+        instance_obj.dispatch_notifications(ev['id'], ev['status'])
 
 
 def main(data, budget, day_start, day_end):
     logger.info(f"Start pacing on {len(data)} bid requests")
-    tz_list = data.TZ.unique().tolist()
     pacing = GlobalPacing(total_budget=budget, start_date=datetime(2020, 7, day_start),
-                          end_date=datetime(2020, 7, day_end), tz_list=tz_list)
+                          end_date=datetime(2020, 7, day_end))
     records = []
     pending_notifications = []
     for utc, row in data.iterrows():

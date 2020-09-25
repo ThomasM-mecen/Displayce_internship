@@ -12,11 +12,6 @@ class Pacing:
 
     def __init__(self, total_budget, start_date, end_date, timezone):
         """Class constructor"""
-        # Raise errors in parameters
-        if total_budget < 0:
-            raise ValueError("Budget cannot be negative!")
-        if start_date > end_date:
-            raise ValueError("Start date cannot be later than end date!")
 
         # Fixed attributes
         self.tz = pytz.timezone(timezone)
@@ -37,6 +32,7 @@ class Pacing:
         self.budget_daily = self.budget_remaining / self.remaining_days
         self.surplus_hour = 0
         self.BT = [0]
+        self.ongoing_br = {}
         self.acceleration = [{'ts': self.start_date,
                               'A': 0}]
         self.speed = [{'ts': self.start_date,
@@ -209,7 +205,7 @@ class Pacing:
             bt = 1
         return bt
 
-    def buying_decision(self, ts, price, imps):
+    def buying_decision(self, ts, price, imps, br_id):
         """From a BR, decide whether to buy or not
 
         :param ts: timestamp of the BR
@@ -277,6 +273,7 @@ class Pacing:
             self.budget_engaged += price
             self.spent_hour += price
             self.nb_buy += 1
+            self.ongoing_br[br_id] = price
         else:
             buying = False
         self.budget_remaining_hourly = self.budget_hour - self.spent_hour
@@ -321,9 +318,10 @@ class Pacing:
         self.spent_hour = 0
         self.budget_remaining_hourly = self.budget_hour - self.spent_hour
 
-    def receive_notification(self, status, br_price):
+    def receive_notification(self, status, br_id):
         """ From a notification, take into account the status (win/lose)
         """
+        br_price = self.ongoing_br[br_id]
         if status == 'win':
             self.budget_engaged -= br_price
             self.budget_spent_total += br_price
@@ -332,31 +330,66 @@ class Pacing:
             self.spent_hour -= br_price
         self.budget_remaining = self.budget_objective - (
                 self.budget_engaged + self.budget_spent_total)
+        del self.ongoing_br[br_id]
 
 
 class GlobalPacing(object):
-    def __init__(self, total_budget, start_date, end_date, tz_list):
+    def __init__(self, total_budget, start_date, end_date):
+
+        # Raise errors in parameters
+        if total_budget < 0:
+            raise ValueError("Budget cannot be negative!")
+        if start_date > end_date:
+            raise ValueError("Start date cannot be later than end date!")
+
         self.total_budget = total_budget
         self.start_date = start_date
         self.end_date = end_date
-        self.tz_list = tz_list
-        self.tz_objective = self.tz_list.copy()
+        self.tz_list = []
+        self.tz_objective = []
         self.timezones = {}
-        self.prop_tz = pd.Series((1 / len(self.tz_list)), index=self.tz_list)
+        self.instances = {}
+        # self.prop_tz = pd.Series((1 / len(self.tz_list)), index=self.tz_list)
 
         # Initial even repartition
-        self.Budget_tz = self.prop_tz * self.total_budget
+        # self.Budget_tz = self.prop_tz * self.total_budget
+        #
+        # # Instance creation
+        # self.instances = {}
+        # for key in self.tz_list:
+        #     self.instances[key] = Pacing(total_budget=self.Budget_tz[key],
+        #                                  start_date=self.start_date,
+        #                                  end_date=self.end_date, timezone=key)
 
-        # Instance creation
-        self.instances = {}
-        for key in self.tz_list:
-            self.instances[key] = Pacing(total_budget=self.Budget_tz[key],
-                                         start_date=self.start_date,
-                                         end_date=self.end_date, timezone=key)
+    def new_instance(self, new_tz):
+        if not self.instances:
+            self.tz_list.append(new_tz)
+            self.tz_objective.append(new_tz)
+            self.instances[new_tz] = Pacing(total_budget=self.total_budget,
+                                            start_date=self.start_date,
+                                            end_date=self.end_date, timezone=new_tz)
+        else:
+            budget_tz = self.total_budget / (len(self.tz_list) + 1)
+            self.instances[new_tz] = Pacing(total_budget=budget_tz,
+                                            start_date=self.start_date,
+                                            end_date=self.end_date, timezone=new_tz)
+            for key in self.tz_list:
+                self.instances[key].reallocate_budget(budget_tz)
+            self.tz_list.append(new_tz)
+            self.tz_objective.append(new_tz)
+
 
     def choose_pacing(self, ts, tz, price, imps, br_id):
         local_date = datetime.fromtimestamp(ts, tz=pytz.timezone(tz))
-        buying = self.instances[tz].buying_decision(local_date, price, imps)
+        # Before the campaign?
+        if local_date < pytz.timezone(tz).localize(self.start_date):
+            raise ValueError("BR before campaign start date")
+        # End of the campaign?
+        if local_date > pytz.timezone(tz).localize(self.end_date + timedelta(days=1)):
+            raise ValueError("BR after campaign end date")
+        if tz not in self.instances.keys():
+            self.new_instance(tz)
+        buying = self.instances[tz].buying_decision(local_date, price, imps, br_id)
         if buying:
             self.timezones[br_id] = tz
         budget_remaining = self.instances[tz].budget_remaining
@@ -380,15 +413,16 @@ class GlobalPacing(object):
         # We check if there is at least one timezone to dispatch the surplus budget
         if len(self.tz_objective) > 0:
             surplus_budget = (old_objective - new_objective) / len(self.tz_objective)
+#             print('here')
             self.instances[tz].reallocate_budget(new_objective)
             for key in self.tz_objective:
                 self.instances[key].reallocate_budget(self.instances[key].budget_objective +
                                                       surplus_budget)
 
-    def dispatch_notifications(self, br_id, status, br_price):
+    def dispatch_notifications(self, br_id, status):
         tz = self.timezones[br_id]
         del self.timezones[br_id]
-        self.instances[tz].receive_notification(status, br_price)
+        self.instances[tz].receive_notification(status, br_id)
 
     def pacing_performance(self):
         spents = []
