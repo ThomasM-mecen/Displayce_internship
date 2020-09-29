@@ -16,7 +16,9 @@ def main(data, budget):
     for utc, row in data.iterrows():
         if i and utc > datetime(2020, 7, 9):
             i = False
-            pacing.change_setup(budget + 1000)
+            req.post("http://127.0.0.1:8000/li/1/reset", json={
+                "new_budget": budget + 1000
+            })
         tz = row['TZ']
         ts = row['ts']
         local = datetime.fromtimestamp(ts, tz=pytz.timezone(tz))
