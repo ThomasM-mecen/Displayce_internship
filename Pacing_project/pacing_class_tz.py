@@ -6,8 +6,9 @@ import itertools
 from statsmodels.formula.api import ols
 
 
+# Temporal pacing class
 class Pacing:
-    """ The pacing algorithm class
+    """ The temporal pacing algorithm class
     """
 
     def __init__(self, total_budget, start_date, end_date, timezone):
@@ -18,15 +19,16 @@ class Pacing:
         self.start_date = self.tz.localize(start_date)
         self.end_date = self.tz.localize(end_date + timedelta(days=1))
         self.total_days = (self.end_date - self.start_date).days
-        # Initialize variables for the first day
+        # data for the linear regression
+        self.building = list()
+        self.building_data = pd.DataFrame.from_records(self.building)
+        # Initialise variables
+        self.remaining_days = (self.end_date - self.start_date).days
         self.budget_objective = total_budget
         self.budget_engaged = 0
         self.budget_spent_total = 0
         self.budget_remaining = self.budget_objective - (
                 self.budget_engaged + self.budget_spent_total)
-        self.building = list()
-        self.building_data = pd.DataFrame.from_records(self.building)
-        self.remaining_days = (self.end_date - self.start_date).days
         self.current_hour = -1
         self.budget_remaining_hourly = 0
         self.budget_daily = self.budget_remaining / self.remaining_days
@@ -48,18 +50,24 @@ class Pacing:
         self.nb_buy = 0
         self.prop_purchase = 0
         self.spent_per_sec = 0
-        self.new_objective = None
-        self.trigger_count = False
         self.surplus_hour = 0
         self.spent_hour = 0
+        # Flag variables
+        self.new_objective = None
+        self.trigger_count = False
         self.block_increase = False
         self.first_br = True
         self.first_day = True
         self.never_buy = False
 
+    # Functions for the linear regression
     @staticmethod
     def gen_prop_lr(br_object):
-        """Linear regression with hours and weekdays"""
+        """Linear regression with hours and weekdays
+
+        :param br_object: historical data about bid requests to perform linear regression
+        :return: Dataframe
+        """
         aggr = br_object.imps.groupby([br_object.index.date, br_object.index.weekday, br_object.index.hour]).sum()
         aggr.index.names = ['date', 'weekday', 'hour']
         aggr = aggr.reset_index()
@@ -81,7 +89,11 @@ class Pacing:
 
     @staticmethod
     def gen_prop_lr_hour(br_object):
-        """Linear regression with only hours"""
+        """Linear regression with only hours
+
+        :param br_object: historical data about bid requests to perform linear regression
+        :return: Dataframe
+        """
         aggr = br_object.imps.groupby([br_object.index.date, br_object.index.hour]).sum().reset_index()
         aggr.columns = ['date', 'hour', 'imps']
         model = ols('imps ~ C(hour)', data=aggr).fit()
@@ -121,18 +133,22 @@ class Pacing:
                 prop = self.gen_prop_lr(data)
         return prop, unif, without_weekday
 
+    # Function to reset variables when we start a new day
     def day_reset(self, ts):
         """ Reset variables when there is a new day
+
+        :param ts: timestamp
         """
         day = ts.day
         month = ts.month
         year = ts.year
-        self.remaining_days = (self.end_date - ts).days + 1  # +1 because biased calculation of days
+        self.remaining_days = (self.end_date - ts).days + 1  # +1 because we have to take the end of the day
         if not self.building:
             self.building_data = pd.DataFrame.from_records(self.building)
         else:
             self.first_day = False
             self.building_data = pd.DataFrame.from_records(self.building, index='Date')
+        # Reinitialise some variables
         self.current_hour = -1
         self.budget_remaining_hourly = 0
         self.budget_daily = self.budget_remaining / self.remaining_days
@@ -148,8 +164,11 @@ class Pacing:
         self.sum_speed = 0
         self.prop_table, self.unif, self.without_weekday = self.meta_prop(self.building_data)
 
+    # Function when we change hour
     def hour_reset(self, weekday):
         """ Reset budget for the following hour
+
+        :param weekday: week day integer
         """
         self.current_hour += 1
         self.remaining_hours = 24 - self.current_hour
@@ -167,8 +186,11 @@ class Pacing:
         self.spent_hour = 0
         self.budget_remaining_hourly = self.budget_hour - self.spent_hour
 
+    # Mean of budget variation and speed of variation the last 30 minutes
     def gen_mean(self, mean_type):
         """ Return the average variation and speed of variation for bt
+
+        :param mean_type: 'acceleration' or 'speed'
         """
         created_time = self.acceleration[-1]['ts'] - timedelta(minutes=30)
         if mean_type == 'acceleration':
@@ -191,11 +213,22 @@ class Pacing:
                 average = 0
         return average
 
+    # Build the dataframe for the linear regression
     def build_data_prop(self, ts, imps):
+        """ Build Dataframe for the proportion per hour linear regression
+
+        :param ts: current timestamp
+        :param imps: number of impressions
+        """
         self.building.append({'Date': ts, 'imps': imps})
 
     def bt_calculation(self, average_acceleration, average_speed, remaining_time, coef=1):
-        """ Return the per second budget
+        """ Calculate the available budget per second
+
+        :param average_acceleration: mean of acceleration over 30 min
+        :param average_speed: mean of speed over 30 min
+        :param remaining_time: remaining time in seconds before the end of the hour
+        :param coef: importance of speed and variation in the formula (default is one)
         """
         alpha = average_acceleration * coef
         try:
@@ -206,12 +239,14 @@ class Pacing:
             bt = 1
         return bt
 
+    # Function to make the buying decision. This the main function of the pacing class algorithm
     def buying_decision(self, ts, price, imps, br_id):
         """From a BR, decide whether to buy or not
 
         :param ts: timestamp of the BR
         :param price: price of the BR
         :param imps: number of impressions
+        :param br_id: id of bid request
         :return: Boolean
         """
 
@@ -294,7 +329,13 @@ class Pacing:
 
         return buying
 
+    # Proportion of buying
     def check_proportion(self, ts):
+        """ Check if the algorithm needs to buy a high volume of bid requests to reach the objective
+
+        :param ts: current timestamp
+        :return: New objective if we have to lower the budget or none if it is already ok
+        """
         self.prop_purchase = self.nb_buy / self.nb_br
         if not self.first_day and self.trigger_count and self.prop_purchase >= 0.7:
             elapsed_time = datetime.timestamp(ts) - datetime.timestamp(self.start_date)
@@ -307,7 +348,12 @@ class Pacing:
                 self.ts_first_br = datetime.timestamp(ts)
                 return new_objective
 
+    # Function to reset the spend objective
     def reallocate_budget(self, new_objective):
+        """ This function handle a reset of the budget that needs to be spent
+
+        :param new_objective: budget
+        """
         self.budget_objective = new_objective
         self.budget_remaining = self.budget_objective - (
                 self.budget_engaged + self.budget_spent_total)
@@ -326,8 +372,12 @@ class Pacing:
         self.spent_hour = 0
         self.budget_remaining_hourly = self.budget_hour - self.spent_hour
 
+    # Function to handle the reception of a notification
     def receive_notification(self, status, br_id):
         """ From a notification, take into account the status (win/lose)
+
+        :param status: 'win' or 'lose'
+        :param br_id: id of the bid request
         """
         br_price = self.ongoing_br[br_id]
         if status == 'win':
@@ -341,6 +391,7 @@ class Pacing:
         del self.ongoing_br[br_id]
 
 
+# Class to create handle  different time zones. It allows a dynamic budget reallocation between instances
 class GlobalPacing(object):
     def __init__(self, total_budget, start_date, end_date):
 
@@ -358,13 +409,24 @@ class GlobalPacing(object):
         self.timezones = {}
         self.instances = {}
 
+    # If we need to change the setup
     def change_setup(self, new_budget):
+        """This function allows to change the budget allocated initially to the line item
+
+        :param new_budget: new budget to be spent
+        :return:
+        """
         self.total_budget = new_budget
         budget_tz = self.total_budget / len(self.tz_list)
         for key in self.tz_list:
             self.instances[key].reallocate_budget(budget_tz)
 
+    # When we receive a bid request from a timezone that we have never met
     def new_instance(self, new_tz):
+        """ Generate a new instance of the temporal pacing class when there is a new time zone
+
+        :param new_tz: name of the new timezone
+        """
         if not self.instances:
             self.tz_list.append(new_tz)
             self.tz_objective.append(new_tz)
@@ -381,7 +443,17 @@ class GlobalPacing(object):
             self.tz_list.append(new_tz)
             self.tz_objective.append(new_tz)
 
+    # Main function to select the good pacing instance and make the buying decision
     def choose_pacing(self, ts, tz, price, imps, br_id):
+        """ Function to select the good pacing instance and return the buying decision
+
+        :param ts: timestamp of the br
+        :param tz: time zone of the br
+        :param price: price of the br
+        :param imps: number of impressions
+        :param br_id: id of the br
+        :return: buying decision with some statistics
+        """
         local_date = datetime.fromtimestamp(ts, tz=pytz.timezone(tz))
         # Before the campaign?
         if local_date < pytz.timezone(tz).localize(self.start_date):
@@ -404,7 +476,14 @@ class GlobalPacing(object):
         objective = self.instances[tz].budget_objective
         return buying, budget_remaining, spent_budget, budget_engaged, objective, prop
 
+    # Function called when we have to set new objectives of spend
     def set_new_objectives(self, old_objective, new_objective, tz):
+        """ Allow to dynamically reallocate budget between time zones
+
+        :param old_objective: budget objective before
+        :param new_objective: new budget objective
+        :param tz: timezone related to the changement
+        """
         for key in self.tz_list:
             # We delete the tz from the list to block the increase
             if self.instances[key].block_increase:
@@ -420,12 +499,22 @@ class GlobalPacing(object):
                 self.instances[key].reallocate_budget(self.instances[key].budget_objective +
                                                       surplus_budget)
 
+    # Function to call the good instance when we receive a notification
     def dispatch_notifications(self, br_id, status):
+        """Dispatch notifications to the good instances of pacing
+
+        :param br_id: id of the br
+        :param status: 'win' or 'lose'
+        """
         tz = self.timezones[br_id]
         del self.timezones[br_id]
         self.instances[tz].receive_notification(status, br_id)
 
+    # Function to see the current spent of all time zones
     def pacing_performance(self):
+        """Function that return a list of expenditure of each time zone
+
+        """
         spents = []
         for key in self.tz_list:
             spents.append(self.instances[key].budget_spent_total)

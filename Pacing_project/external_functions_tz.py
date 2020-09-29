@@ -5,6 +5,7 @@ import pytz
 from loguru import logger
 
 
+# Send pending notifications
 def send_pending_notifications(instance_obj, pending_notif, current_ts=None):
     """ Send notifications
 
@@ -17,7 +18,16 @@ def send_pending_notifications(instance_obj, pending_notif, current_ts=None):
         instance_obj.dispatch_notifications(ev['id'], ev['status'])
 
 
+# Main function to simulate the algorithm
 def main(data, budget, day_start, day_end):
+    """ Function that simulates the algorithm on a dataframe of bid requests
+
+    :param data: Dataframe of br
+    :param budget: budget of the line item
+    :param day_start: starting date
+    :param day_end: ending date
+    :return: Dataframe to see performances
+    """
     logger.info(f"Start pacing on {len(data)} bid requests")
     pacing = GlobalPacing(total_budget=budget, start_date=datetime(2020, 7, day_start),
                           end_date=datetime(2020, 7, day_end))

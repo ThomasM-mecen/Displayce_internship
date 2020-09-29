@@ -8,12 +8,14 @@ from wsgiref import simple_server
 api = falcon.API()
 
 
+# Store data
 class DataBase(object):
     def __init__(self):
         self.campaigns = {}
         self.instances = {}
 
 
+# Controller to initialise a campaign
 class InitCampaign(object):
     def __init__(self, bdd):
         self.bdd = bdd
@@ -56,6 +58,7 @@ class InitCampaign(object):
         resp.status = falcon.HTTP_200
 
 
+# Controller to initialise a line item
 class InitLineItem(object):
 
     def __init__(self, bdd):
@@ -124,6 +127,7 @@ class InitLineItem(object):
         resp.status = falcon.HTTP_200
 
 
+# Controller to have the status of a line item
 class LineItem(object):
     def __init__(self, bdd):
         self.bdd = bdd
@@ -181,6 +185,7 @@ class LineItem(object):
         })
 
 
+# Controller to handle the reception of a bid request (make a buying decision)
 class ReceiveBR(object):
     def __init__(self, bdd):
         self.bdd = bdd
@@ -220,6 +225,7 @@ class ReceiveBR(object):
         resp.status = falcon.HTTP_200
 
 
+# Controller to change the setup of a campaign
 class ChangeSetup(object):
     def __init__(self, bdd):
         self.bdd = bdd
@@ -249,6 +255,7 @@ class ChangeSetup(object):
         resp.status = falcon.HTTP_200
 
 
+# Controller to take into account the notification (win or lose)
 class ReceiveNotification(object):
     def __init__(self, bdd):
         self.bdd = bdd

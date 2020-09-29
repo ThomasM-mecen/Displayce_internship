@@ -4,7 +4,15 @@ from datetime import datetime
 import pytz
 
 
+# Main function to simulate the API
 def main(data, budget):
+    """Function to simulate the API
+
+    :param data: Dataframe of br
+    :param budget: budget allocated to the line item
+    :return:
+    """
+    # Initialise the campaign and the line item
     req.post("http://127.0.0.1:8000/campaign", json={"cpid": "1"})
     req.post("http://127.0.0.1:8000/campaign/1/init", json={
         "budget": budget,
@@ -16,6 +24,7 @@ def main(data, budget):
     for utc, row in data.iterrows():
         if i and utc > datetime(2020, 7, 9):
             i = False
+            # Simulate a reset in the budget
             req.post("http://127.0.0.1:8000/li/1/reset", json={
                 "new_budget": budget + 1000
             })
@@ -39,13 +48,11 @@ def main(data, budget):
             "imps": row['imps'],
             "cpm": row['CPM']
         })
+        # Receive a notification
         req.post("http://127.0.0.1:8000/li/1/notif", json={
             "status": "win" if row['win'] else "lose",
             "brid": row['id']
         })
-
-        # buying, budget_remaining, spent_budget, budget_engaged, objective, prop = pacing.choose_pacing(
-        #     ts, tz, row['price'], row['imps'], row['id'])
     return
 
 
