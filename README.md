@@ -24,7 +24,8 @@ Note: ```pacing_class.py```, ```external_functions.py``` and ```execution.py``` 
 
 
 ## How to use the API
-POST method <br />
+
+**POST method <br />**
 1. Initialise a campaign: 
 ```bash 
 curl --request POST \
@@ -69,8 +70,9 @@ curl --request POST \
 	"brid": ID of BR
 }'
 ```
+<br />
 
-GET method <br />
+**GET method <br />**
 1. Get campaigns list
 ```bash 
 curl --request GET \
