@@ -1,0 +1,18 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{What is Displayce?}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{How does DOOH works?}{section.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.2.1}{Booking and RTB}{subsection.1.2}% 4
+\BOOKMARK [3][-]{subsubsection.1.2.2}{Digital poster operation}{subsection.1.2}% 5
+\BOOKMARK [2][-]{subsection.1.3}{What is a bid request?}{section.1}% 6
+\BOOKMARK [1][-]{section.2}{Auction theory}{}% 7
+\BOOKMARK [2][-]{subsection.2.1}{Types of standard auctions}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.2}{Revenue Equivalence Theorem analysis}{section.2}% 9
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Second-price auction}{subsection.2.2}% 10
+\BOOKMARK [3][-]{subsubsection.2.2.2}{First-price auction}{subsection.2.2}% 11
+\BOOKMARK [2][-]{subsection.2.3}{Entry cost in Vickrey's auction}{section.2}% 12
+\BOOKMARK [1][-]{section.3}{Pacing}{}% 13
+\BOOKMARK [2][-]{subsection.3.1}{Simulation}{section.3}% 14
+\BOOKMARK [2][-]{subsection.3.2}{Algorithm evolution}{section.3}% 15
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Hourly capping}{subsection.3.2}% 16
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Per second budget}{subsection.3.2}% 17
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Evolutive hourly budget}{subsection.3.2}% 18
