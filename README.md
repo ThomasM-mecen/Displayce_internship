@@ -24,14 +24,95 @@ Note: ```pacing_class.py```, ```external_functions.py``` and ```execution.py``` 
 
 
 ## How to use the API
-POST method 
+POST method <br />
 1. Initialise a campaign: 
 ```bash 
 curl --request POST \
   --url http://127.0.0.1:8000/campaign \
   --header 'content-type: application/json' \
   --data '{
-	"cpid": string ID 
+	"cpid": String ID 
 }'
 ```
+2. Initialise a line item:
+```bash
+curl --request POST \
+  --url http://127.0.0.1:8000/campaign/1/init \
+  --header 'content-type: application/json' \
+  --data '{
+	"budget": Budget,
+	"start": String date,
+	"end": String date,
+	"liid": String ID
+}'
+```
+
+3. Send a bid request
+```bash
+curl --request POST \
+  --url http://127.0.0.1:8000/li/1/br \
+  --header 'content-type: application/json' \
+  --data '{
+	"tz": String time zone,
+	"brid": ID of BR,
+	"imps": Number of impressions,
+	"cpm": CPM
+}'
+```
+4. Send notification
+```bash
+curl --request POST \
+  --url http://127.0.0.1:8000/li/1/notif \
+  --header 'content-type: application/json' \
+  --data '{
+	"status": String status,
+	"brid": ID of BR
+}'
+```
+
+GET method <br />
+1. Get campaigns list
+```bash 
+curl --request GET \
+  --url http://127.0.0.1:8000/campaign
+```
+
+2. Get line items list
+```bash 
+curl --request GET \
+  --url http://127.0.0.1:8000/li \
+  --header 'content-type: application/json' \
+  --data '{
+	"budget": 10000,
+	"start": "2020-09-10",
+	"end": "2020-09-30",
+	"liid": 1
+}'
+```
+
+3. Get general status
+```bash
+curl --request GET \
+  --url http://127.0.0.1:8000/li/1/status
+```
+
+4. Get status detailed by time zone
+```bash
+curl --request GET \
+  --url http://127.0.0.1:8000/li/1/status/tz
+```
+5. Get status of a precised time zone
+```bash
+curl --request GET \
+  --url http://127.0.0.1:8000/li/1/status/tz/STRING_TIMEZONE
+```
+Note: The `/` of the timezone in the URL should be replaced by `--`. For example if you want the time zone `America/New_York`:
+```bash 
+curl --request GET \
+  --url http://127.0.0.1:8000/li/1/status/tz/America--New_York
+```
+
+
+
+
 
