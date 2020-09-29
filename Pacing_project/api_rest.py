@@ -44,6 +44,17 @@ class InitCampaign(object):
             "campaigns": length_dict
         })
 
+    def on_delete(self, req, resp):
+        data = json.loads(req.bounded_stream.read())
+        try:
+            del self.bdd.campaigns[data['cpid']]
+        except KeyError:
+            raise falcon.HTTPNotFound(description=f"Campaign {data['cpid']} doesn't exist")
+        resp.body = json.dumps({
+            "status": "ok",
+        })
+        resp.status = falcon.HTTP_200
+
 
 class InitLineItem(object):
 
@@ -84,7 +95,6 @@ class InitLineItem(object):
             self.check_params(data)
         except Exception as e:
             raise falcon.HTTPNotFound(description=str(e))
-
         try:
             pacing = GlobalPacing(total_budget=int(data['budget']),
                                   start_date=datetime.strptime(data['start'], '%Y-%m-%d'),
@@ -98,6 +108,20 @@ class InitLineItem(object):
             raise falcon.HTTPNotFound(description='Budget could be negative OR start date superior to end date')
         resp.status = falcon.HTTP_200
         resp.body = output
+
+    def on_delete(self, req, resp, cpid):
+        data = json.loads(req.bounded_stream.read())
+        if cpid not in self.bdd.campaigns.keys():
+            raise falcon.HTTPNotFound(description=f"Campaign {cpid} doesn't exist")
+        try:
+            del self.bdd.instances[data['liid']]
+        except KeyError:
+            raise falcon.HTTPNotFound(description=f"line item {data['liid']} doesn't exist")
+        self.bdd.campaigns[cpid].remove(data['liid'])
+        resp.body = json.dumps({
+            "status": "ok",
+        })
+        resp.status = falcon.HTTP_200
 
 
 class LineItem(object):
@@ -175,6 +199,7 @@ class ReceiveBR(object):
     def on_post(self, req, resp, liid):
         data = json.loads(req.bounded_stream.read())
         ts = datetime.timestamp(datetime.utcnow())
+        # ts = data['ts']
         try:
             self.check_and_parse_parameters(data)
         except Exception as e:
@@ -191,6 +216,35 @@ class ReceiveBR(object):
         resp.body = json.dumps({
             'status': 'ok',
             'buying': buying
+        })
+        resp.status = falcon.HTTP_200
+
+
+class ChangeSetup(object):
+    def __init__(self, bdd):
+        self.bdd = bdd
+
+    def check_params(self, req):
+        required_argument = {"new_budget"}
+        missing_argument = required_argument.difference(req.keys())
+        if missing_argument:
+            raise KeyError(f"Missing argument {str(missing_argument)} in URL")
+        logger.info(f"Received arguments {req.keys()}")
+        if req['new_budget'] < 0:
+            raise ValueError(f"New budget cannot be negative")
+
+    def on_post(self, req, resp, liid):
+        data = json.loads(req.bounded_stream.read())
+        try:
+            good_instance = self.bdd.instances[liid]
+        except KeyError:
+            raise falcon.HTTPNotFound(description=f"line item {liid} doesn't exist")
+        try:
+            good_instance.change_setup(data['new_budget'])
+        except Exception as e:
+            raise falcon.HTTPNotFound(description=f"Exception {e}")
+        resp.body = json.dumps({
+            'status': 'ok'
         })
         resp.status = falcon.HTTP_200
 
@@ -234,6 +288,7 @@ init_pacing = InitLineItem(bdd)
 br = ReceiveBR(bdd)
 notif = ReceiveNotification(bdd)
 li = LineItem(bdd)
+reset_setup = ChangeSetup(bdd)
 api.add_route("/campaign", init_campaign)
 api.add_route("/campaign/{cpid}/init", init_pacing)
 api.add_route("/li", li)
@@ -242,6 +297,7 @@ api.add_route("/li/{liid}/status/tz", li, suffix="status_all")
 api.add_route("/li/{liid}/status/tz/{tz}", li, suffix="status_tz")
 api.add_route("/li/{liid}/br", br)
 api.add_route("/li/{liid}/notif", notif)
+api.add_route("/li/{liid}/reset", reset_setup)
 
 if __name__ == '__main__':
     httpd = simple_server.make_server('127.0.0.1', 8000, api)

@@ -23,7 +23,11 @@ def main(data, budget, day_start, day_end):
                           end_date=datetime(2020, 7, day_end))
     records = []
     pending_notifications = []
+    i = True
     for utc, row in data.iterrows():
+        if i and utc > datetime(2020, 7, 9):
+            i = False
+            pacing.change_setup(budget + 1000)
         tz = row['TZ']
         ts = row['ts']
         local = datetime.fromtimestamp(ts, tz=pytz.timezone(tz))
@@ -75,5 +79,5 @@ def main(data, budget, day_start, day_end):
     pacing_df.set_index('utc_date', inplace=True)
     logger.info("End of the campaign")
     logger.info(f"Total budget spent: {sum(spents)}")
-    logger.info(f"Remaining budget: {budget - sum(spents)}")
+    logger.info(f"Remaining budget: {pacing.total_budget - sum(spents)}")
     return pacing_df

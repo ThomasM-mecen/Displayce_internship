@@ -55,6 +55,7 @@ class Pacing:
         self.block_increase = False
         self.first_br = True
         self.first_day = True
+        self.never_buy = False
 
     @staticmethod
     def gen_prop_lr(br_object):
@@ -214,6 +215,11 @@ class Pacing:
         :return: Boolean
         """
 
+        # If we have spent all budget then we will never buy
+        if self.never_buy:
+            buying = False
+            return buying
+
         # Check problem in br
         if price < 0:
             return False
@@ -305,6 +311,8 @@ class Pacing:
         self.budget_objective = new_objective
         self.budget_remaining = self.budget_objective - (
                 self.budget_engaged + self.budget_spent_total)
+        if self.budget_remaining < 0:
+            self.never_buy = True
         self.budget_daily = self.budget_remaining / self.remaining_days
         if self.unif:
             self.budget_hour = (self.prop_table * self.budget_daily) + self.surplus_hour
@@ -349,17 +357,12 @@ class GlobalPacing(object):
         self.tz_objective = []
         self.timezones = {}
         self.instances = {}
-        # self.prop_tz = pd.Series((1 / len(self.tz_list)), index=self.tz_list)
 
-        # Initial even repartition
-        # self.Budget_tz = self.prop_tz * self.total_budget
-        #
-        # # Instance creation
-        # self.instances = {}
-        # for key in self.tz_list:
-        #     self.instances[key] = Pacing(total_budget=self.Budget_tz[key],
-        #                                  start_date=self.start_date,
-        #                                  end_date=self.end_date, timezone=key)
+    def change_setup(self, new_budget):
+        self.total_budget = new_budget
+        budget_tz = self.total_budget / len(self.tz_list)
+        for key in self.tz_list:
+            self.instances[key].reallocate_budget(budget_tz)
 
     def new_instance(self, new_tz):
         if not self.instances:
@@ -377,7 +380,6 @@ class GlobalPacing(object):
                 self.instances[key].reallocate_budget(budget_tz)
             self.tz_list.append(new_tz)
             self.tz_objective.append(new_tz)
-
 
     def choose_pacing(self, ts, tz, price, imps, br_id):
         local_date = datetime.fromtimestamp(ts, tz=pytz.timezone(tz))
@@ -413,7 +415,6 @@ class GlobalPacing(object):
         # We check if there is at least one timezone to dispatch the surplus budget
         if len(self.tz_objective) > 0:
             surplus_budget = (old_objective - new_objective) / len(self.tz_objective)
-#             print('here')
             self.instances[tz].reallocate_budget(new_objective)
             for key in self.tz_objective:
                 self.instances[key].reallocate_budget(self.instances[key].budget_objective +
