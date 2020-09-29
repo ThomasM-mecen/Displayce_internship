@@ -25,7 +25,9 @@ Note: ```pacing_class.py```, ```external_functions.py``` and ```execution.py``` 
 
 ## How to use the API
 POST method 
-1. Initialise a campaign: ```bash curl --request POST \
+1. Initialise a campaign: 
+```bash 
+curl --request POST \
   --url http://127.0.0.1:8000/campaign \
   --header 'content-type: application/json' \
   --data '{
