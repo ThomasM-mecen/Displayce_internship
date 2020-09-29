@@ -21,3 +21,15 @@ This is the main folder of the project. It contains all useful scripts about the
 ```test_basics.py``` is basic unit test on the API. <br />
 <br />
 Note: ```pacing_class.py```, ```external_functions.py``` and ```execution.py``` are the same that those with the suffix tz, but the algorithm doesn't allow multiple time zones. 
+
+
+## How to use the API
+POST method 
+1. Initialise a campaign: ```bash curl --request POST \
+  --url http://127.0.0.1:8000/campaign \
+  --header 'content-type: application/json' \
+  --data '{
+	"cpid": string ID 
+}'
+```
+
