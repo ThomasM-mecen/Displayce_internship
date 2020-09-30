@@ -34,7 +34,7 @@ class InitCampaign(object):
         try:
             self.check_params(data)
         except Exception as e:
-            raise falcon.HTTPNotFound(description=str(e))
+            raise falcon.HTTPUnprocessableEntity(description=str(e))
         self.bdd.campaigns[data['cpid']] = []
         resp.body = json.dumps({
             "status": "ok",
@@ -97,7 +97,7 @@ class InitLineItem(object):
         try:
             self.check_params(data)
         except Exception as e:
-            raise falcon.HTTPNotFound(description=str(e))
+            raise falcon.HTTPUnprocessableEntity(description=str(e))
         try:
             pacing = GlobalPacing(total_budget=int(data['budget']),
                                   start_date=datetime.strptime(data['start'], '%Y-%m-%d'),
@@ -108,7 +108,8 @@ class InitLineItem(object):
                 "status": "ok",
             })
         except ValueError:
-            raise falcon.HTTPNotFound(description='Budget could be negative OR start date superior to end date')
+            raise falcon.HTTPUnprocessableEntity(description='Budget could be negative OR start date superior to end '
+                                                             'date')
         resp.status = falcon.HTTP_200
         resp.body = output
 
@@ -196,10 +197,6 @@ class ReceiveBR(object):
         if missing_argument:
             raise KeyError(f"Missing argument {str(missing_argument)} in URL")
         logger.info(f"Received arguments {req.keys()}")
-        try:
-            (req['imps'] * req['cpm']) / 1000
-        except ValueError:
-            raise ValueError("Unable to interpret the price of the br")
 
     def on_post(self, req, resp, liid):
         data = json.loads(req.bounded_stream.read())
@@ -208,16 +205,15 @@ class ReceiveBR(object):
         try:
             self.check_and_parse_parameters(data)
         except Exception as e:
-            raise falcon.HTTPNotFound(description=str(e))
+            raise falcon.HTTPUnprocessableEntity(description=str(e))
         try:
             good_instance = self.bdd.instances[liid]
         except KeyError:
             raise falcon.HTTPNotFound(description=f"line item {liid} doesn't exist")
         try:
-            price = (data['imps'] * data['cpm']) / 1000
-            buying, *_ = good_instance.choose_pacing(ts, data['tz'], price, data['imps'], data['brid'])
+            buying, *_ = good_instance.choose_pacing(ts, data['tz'], data['cpm'], data['imps'], data['brid'])
         except Exception as e:
-            raise falcon.HTTPNotFound(description=str(e))
+            raise falcon.HTTPUnprocessableEntity(description=str(e))
         resp.body = json.dumps({
             'status': 'ok',
             'buying': buying
@@ -248,7 +244,7 @@ class ChangeSetup(object):
         try:
             good_instance.change_setup(data['new_budget'])
         except Exception as e:
-            raise falcon.HTTPNotFound(description=f"Exception {e}")
+            raise falcon.HTTPUnprocessableEntity(description=f"Exception {e}")
         resp.body = json.dumps({
             'status': 'ok'
         })
@@ -274,7 +270,7 @@ class ReceiveNotification(object):
         try:
             self.check_params(data)
         except Exception as e:
-            raise falcon.HTTPNotFound(description=str(e))
+            raise falcon.HTTPUnprocessableEntity(description=str(e))
         try:
             good_instance = self.bdd.instances[liid]
         except KeyError:

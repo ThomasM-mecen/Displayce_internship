@@ -39,7 +39,7 @@ def test_init_campaign_check_status_code(init_campaign):
     response1 = init_campaign
     response2 = req.post("http://127.0.0.1:8000/campaign", json={"cpid": "1"})
     assert response1.status_code == 200
-    assert response2.status_code == 404
+    assert response2.status_code == 422
 
 
 def test_init_li_check_status_code(init_li):
@@ -53,7 +53,7 @@ def test_init_li_check_status_code(init_li):
         "liid": "1"
     })
     assert response1.status_code == 200
-    assert response2.status_code == 404
+    assert response2.status_code == 422
 
 
 def test_buying_br(init_li):
