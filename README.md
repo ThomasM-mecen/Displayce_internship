@@ -79,7 +79,7 @@ curl --request GET \
   --url http://127.0.0.1:8000/campaign
 ```
 The output is JSON format. For example the if we a campaign with the ID "1" and 3 line items for this campaign:
-```json
+```javascript
 {
   "campaigns": {
     "1": 3
