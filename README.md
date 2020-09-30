@@ -73,13 +73,15 @@ curl --request POST \
 <br />
 
 **GET method <br />**
+Note that all output are in JSON format. <br />
+
 1. Get campaigns list
 ```bash 
 curl --request GET \
   --url http://127.0.0.1:8000/campaign
 ```
-The output is JSON format. For example the if we a campaign with the ID "1" and 3 line items for this campaign:
-```javascript
+For example the if there is a campaign with the ID "1" and 3 line items for this campaign:
+```json
 {
   "campaigns": {
     "1": 3
@@ -92,11 +94,29 @@ The output is JSON format. For example the if we a campaign with the ID "1" and 
 curl --request GET \
   --url http://127.0.0.1:8000/li
 ```
+The output for 3 line items would be the following:
+```json
+{
+  "status": "ok",
+  "LineItems": [
+    "1",
+    "2",
+    "3"
+  ]
+}
+```
 
 3. Get general status
 ```bash
 curl --request GET \
   --url http://127.0.0.1:8000/li/1/status
+```
+The general status of a line item returns the sum of expenditures and the total remaining budget:
+```json
+{
+  "spent": 0,
+  "remaining": 10000
+}
 ```
 
 4. Get status detailed by time zone
@@ -104,6 +124,20 @@ curl --request GET \
 curl --request GET \
   --url http://127.0.0.1:8000/li/1/status/tz
 ```
+The output is the expenditure per time zone. Assuming that we have spent $1 in the time zone America/New_York, the output would be:
+```json
+{
+  "spent": {
+    "Europe/Paris": 0,
+    "America/New_york": 1.0
+  },
+  "remaining": {
+    "Europe/Paris": 5000.0,
+    "America/New_york": 4999.0
+  }
+}
+```
+
 5. Get status of a precised time zone
 ```bash
 curl --request GET \
@@ -114,6 +148,14 @@ Note: The `/` of the timezone in the URL should be replaced by `--`. For example
 curl --request GET \
   --url http://127.0.0.1:8000/li/1/status/tz/America--New_York
 ```
+The output would be then:
+```json
+{
+  "spent": 1.0,
+  "remaining": 4999.0
+}
+```
+
 
 
 
