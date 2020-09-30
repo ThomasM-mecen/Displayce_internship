@@ -161,8 +161,15 @@ The output would be then:
 }
 ```
 
+**Test the API<br />**
+You can launch unit tests on the API by starting the local server and then execute the following command:
+```bash
+py.test .
+```
 
-
-
+To test the API in "real" conditions, you can start the local server, and if you have a br dataframe, just launch the ```exec_api.py``` script.
+```bash
+python exec_api.py
+```
 
 
