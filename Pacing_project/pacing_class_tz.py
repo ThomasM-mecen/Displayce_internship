@@ -161,7 +161,7 @@ class Pacing:
         self.prop_table, self.unif, self.without_weekday = self.meta_prop(self.buffer_data)
 
     # Function when we change hour
-    def hour_reset(self, weekday):
+    def change_hour(self, weekday):
         """ Reset budget for the following hour
 
         :param weekday: week day integer
@@ -282,7 +282,7 @@ class Pacing:
 
         # Changement of hour
         while hour != self.current_hour:
-            self.hour_reset(self.weekday)
+            self.change_hour(self.weekday)
 
         # Build data for proportion lr
         self.build_data_prop(ts, imps)
