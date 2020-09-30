@@ -61,7 +61,7 @@ def test_buying_br(init_li):
         "tz": "America/New_York",
         "brid": 1,
         "imps": 1,
-        "cpm": 1000
+        "cpm": 333.333333333333333333333333333333333333333333333333333333
     })
     response_br_body = response_br.json()
     response_status_before_notif = req.get("http://127.0.0.1:8000/li/1/status")
@@ -75,4 +75,4 @@ def test_buying_br(init_li):
     print(response_br_body)
     assert response_br_body["buying"]
     assert response_status_before_notif_body["spent"] == 0
-    assert response_status_after_notif_body["spent"] == 1
+    assert pytest.approx(response_status_after_notif_body["spent"], 0.001) == 0.333
