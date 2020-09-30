@@ -10,7 +10,7 @@
 
 4. The Miscellaneous folder contains miscellaneous things such as work on auction theory
 
-## Details Pacing_project
+## Pacing_project
 
 This is the main folder of the project. It contains all useful scripts about the pacing algorithm. <br />
 ```pacing_class_tz.py``` is the script that contains the final algorithm. <br />
