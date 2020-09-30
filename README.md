@@ -18,7 +18,7 @@ This is the main folder of the project. It contains all useful scripts about the
 ```execution_tz.py``` allows to simulate the algorithm on a dataframe (give any dataframe on the data folder). <br />
 ```api_rest.py``` is the script to generate the API of the algorithm. It allows to launch a local server. <br />
 ```exec_api.py``` is the script that simulates the API (with a dataframe of br situated in the data folder). <br />
-```test_basics.py``` is basic unit test on the API. <br />
+```test_basics.py``` is basic unit tests on the API. <br />
 <br />
 Note: ```pacing_class.py```, ```external_functions.py``` and ```execution.py``` are the same that those with the suffix tz, but the algorithm doesn't allow multiple time zones. 
 
