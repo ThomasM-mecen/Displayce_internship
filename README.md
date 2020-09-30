@@ -66,7 +66,7 @@ curl --request POST \
   --url http://127.0.0.1:8000/li/1/notif \
   --header 'content-type: application/json' \
   --data '{
-	"status": String status,
+	"status": Status: must be 'win' or 'lose',
 	"brid": ID of BR
 }'
 ```
@@ -82,14 +82,7 @@ curl --request GET \
 2. Get line items list
 ```bash 
 curl --request GET \
-  --url http://127.0.0.1:8000/li \
-  --header 'content-type: application/json' \
-  --data '{
-	"budget": 10000,
-	"start": "2020-09-10",
-	"end": "2020-09-30",
-	"liid": 1
-}'
+  --url http://127.0.0.1:8000/li
 ```
 
 3. Get general status
