@@ -25,6 +25,11 @@ Note: ```pacing_class.py```, ```external_functions.py``` and ```execution.py``` 
 
 ## How to use the API
 
+To start a local server in order to use the API, launch on a terminal the following command:
+```bash 
+python api_rest.py
+```
+
 **POST method <br />**
 1. Initialise a campaign: 
 ```bash 
